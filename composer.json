@@ -1,0 +1,26 @@
+{
+    "name": "poirot/cldr",
+    "description": "Provides an API to retrieve data from the CLDR",
+    "authors": [
+        {
+            "name": "Payam Naderi",
+            "email": "naderi.payam@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.3.3"
+    },
+    "autoload": {
+        "psr-0": {
+            "Poirot\\Cldr": "/Poirot/Cldr"
+        }
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "http://packages.raya-media.com/"
+        }
+    ]
+}
