@@ -136,6 +136,19 @@ class LDML implements ReaderInterface
         $path = (strpos($path, 'ldml') === false) ? $path = 'ldml/'.$path : $path;
         $path = rtrim('/'.$path, '/');
 
+        $xpathAttr = ''; $i = 0;
+        foreach($attributes as $key => $val) {
+            // make xpath attribute query [@type=persian and @attr=value]
+            $xpathAttr = ($i == 0) ? '['.$xpathAttr : $xpathAttr;
+            $xpathAttr .= ($i > 0) ? ' and ' : '';
+            $xpathAttr .= '@'.$key.'="'.$val.'"';
+            $xpathAttr = ($i == count($attributes)-1) ? $xpathAttr.']' : $xpathAttr;
+
+            $i++;
+        }
+
+        $path = ($xpathAttr) ? $path.$xpathAttr : $path;
+
         $xml = $this->attainSimpleXMLElement();
 
         // without attribute - read all values
@@ -168,32 +181,27 @@ class LDML implements ReaderInterface
         $return = array();
 
         $prevElementName = ''; $i = 0;
-        foreach ($xmlElement as $r) {
-
+        foreach ($xmlElement as $r)
+        {
             $elementName = $r->getName();
-            $elementName = ($elementName === $prevElementName) ? $elementName.'_'.++$i : $elementName;
+            $newElementName = ($elementName === $prevElementName) ? $elementName.'_'.++$i : $elementName;
 
             $prevElementName = $elementName;
 
-            $key = 'content';
             $content = null;
-
             if (count($r)) {
-                $return[$elementName] = $this->parsElement($r);
-
-                continue;
+                $content = $this->parsElement($r);
             }
-
             $content = ($content) ? $content : (string) $r;
 
+            $key = 'value';
             $elementAttrs = (array)$r->attributes();
             $elementAttrs = ($elementAttrs) ? $elementAttrs['@attributes'] : $elementAttrs;
             if ($content) {
                 $elementAttrs[$key] = $content;
             }
 
-            $return[$elementName] = $elementAttrs;
-
+            $return[$newElementName] = $elementAttrs;
         }
 
         return $return;
