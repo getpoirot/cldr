@@ -140,7 +140,16 @@ class LDML implements ReaderInterface
 
         // without attribute - read all values
         // with attribute    - read only this value
+        set_error_handler(
+            function ($error, $message = '', $file = '', $line = 0) {
+                throw new \Exception(
+                    $message,
+                    $error
+                );
+            }
+        );
         $result = $xml->xpath($path);
+        restore_error_handler();
 
         $result = $this->parsElement($result);
 
@@ -159,7 +168,9 @@ class LDML implements ReaderInterface
         $return = array();
 
         $prevElementName = ''; $i = 0;
-        foreach ($xmlElement as $elementName => $r) {
+        foreach ($xmlElement as $r) {
+
+            $elementName = $r->getName();
 
             $key = 'content';
             $content = null;
@@ -178,7 +189,7 @@ class LDML implements ReaderInterface
                 $elementAttrs[$key] = $content;
             }
 
-            $elementName = ($elementName == $prevElementName) ? $elementName.'_'.++$i : $elementName;
+            $elementName = ($elementName === $prevElementName) ? $elementName.'_'.++$i : $elementName;
             $return[$elementName] = $elementAttrs;
             $prevElementName = $elementName;
         }
