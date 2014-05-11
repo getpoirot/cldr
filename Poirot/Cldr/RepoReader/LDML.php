@@ -8,6 +8,17 @@ namespace Poirot\Cldr\RepoReader;
  */
 class LDML implements ReaderInterface
 {
+    /**
+     * @var string File path to repo XML
+     */
+    protected $repo;
+
+    /**
+     * Repos XmlElement cache to avoid repeatation
+     *
+     * @var array(\SimpleXMLElement)
+     */
+    protected $simpleXMLElement;
 
     /**
      * Set repository data
@@ -18,7 +29,7 @@ class LDML implements ReaderInterface
      */
     public function setRepo($repo)
     {
-        // TODO: Implement setRepo() method.
+        $this->repo = $repo;
     }
 
     /**
@@ -28,15 +39,65 @@ class LDML implements ReaderInterface
      */
     public function getRepo()
     {
-        // TODO: Implement getRepo() method.
+        return $this->repo;
     }
 
     /**
-     * Get list of data for a path with defined attributes
+     * Is valid Repository?
+     *
+     * @return boolean
+     */
+    public function isValidRepo()
+    {
+        $simpleXml = $this->attainSimpleXMLElement();
+
+        return $simpleXml instanceof \SimpleXMLElement;
+    }
+
+    /**
+     * Load current repo into simpleXMLElement object
+     *
+     * @return \SimpleXMLElement|false
+     */
+    protected function attainSimpleXMLElement()
+    {
+        $return = false;
+
+        $repo = $this->getRepo();
+
+        $repoNormalizeName = $repo;
+        if (isset($this->simpleXMLElement[$repoNormalizeName])) {
+            // load simpleXmlElement from internal cache to avoid load it again
+            return $this->simpleXMLElement[$repoNormalizeName];
+        }
+
+        if ($repo && file_exists($repo)) {
+            $xml = file_get_contents($repo);
+            try {
+                set_error_handler(function() {});
+                $return = new \SimpleXMLElement($xml);
+                $return = ($return instanceof \SimpleXMLElement) ? $return : false;
+                restore_error_handler();
+            } catch (\Exception $e)
+            {
+                $return = $return && false;
+            }
+        }
+
+        if ($return) {
+            // save into internal cache to avoid repeatation
+            $this->simpleXMLElement[$repoNormalizeName] = $return;
+        }
+
+        return $return;
+    }
+
+    /**
+     * Get data entity for a path with defined attributes
      * <pre>
-     *   getListByPath('localeDisplayNames/languages');
+     *   getEntityByPath('localeDisplayNames/languages');
      *   // or
-     *   getListByPath('dates/calendars/calendar', array('type' => 'persian'));
+     *   getEntityByPath('dates/calendars/calendar', array('type' => 'persian'));
      * </pre>
      *
      * @param string $path Path to an element list
@@ -44,21 +105,83 @@ class LDML implements ReaderInterface
      *
      * @return mixed
      */
-    public function getListByPath($path, array $attributes = array())
+    public function getEntityByPath($path, array $attributes = array())
     {
-        // TODO: Implement getListByPath() method.
+        $result = $this->readXml($path, $attributes);
+
+        echo '<pre>';
+        var_dump($result);
+        exit;
     }
 
     /**
-     * Get Content String For Given Path
+     * Read the content from locale
      *
-     * @param string $path Path to an element list
-     * @param array $attributes Array key=>value pair of an element attribute
+     * @param  string $attribute
      *
-     * @return string
+     * @return array
      */
-    public function getContentByPath($path, array $attributes = array())
+    protected function readXml($path, array $attributes = array())
     {
-        // TODO: Implement getContentByPath() method.
+        if (! $this->isValidRepo()) {
+            throw new \Exception(
+                sprintf(
+                    'The Repository "%s" is not valid repository or not found.',
+                    $this->getRepo()
+                )
+            );
+        }
+
+        $path = ltrim($path, '/');
+        $path = (strpos($path, 'ldml') === false) ? $path = 'ldml/'.$path : $path;
+        $path = rtrim('/'.$path, '/');
+
+        $xml = $this->attainSimpleXMLElement();
+
+        // without attribute - read all values
+        // with attribute    - read only this value
+        $result = $xml->xpath($path);
+
+        $result = $this->parsElement($result);
+
+        return $result;
+    }
+
+    /**
+     * Parse Element Attribute and Content Into Array
+     *
+     * @param \SimpleXMLElement $xmlElement SimpleXmlElement
+     *
+     * @return array
+     */
+    protected function parsElement($xmlElement)
+    {
+        $return = array();
+
+        $prevElementName = ''; $i = 0;
+        foreach ($xmlElement as $elementName => $r) {
+
+            $key = 'content';
+            $content = null;
+
+            if (count($r)) {
+                $key = $elementName;
+                $content = $this->parsElement($r);
+            }
+
+            $content = ($content) ? $content : (string) $r;
+
+            $elementAttrs = (array)$r->attributes();
+            $elementAttrs = ($elementAttrs) ? $elementAttrs['@attributes'] : $elementAttrs;
+            if ($content) {
+                $elementAttrs[$key] = $content;
+            }
+
+            $elementName = ($elementName == $prevElementName) ? $elementName.'_'.++$i : $elementName;
+            $return[$elementName] = $elementAttrs;
+            $prevElementName = $elementName;
+        }
+
+        return $return;
     }
 }

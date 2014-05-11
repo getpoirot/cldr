@@ -25,11 +25,18 @@ interface ReaderInterface
     public function getRepo();
 
     /**
-     * Get list of data for a path with defined attributes
+     * Is valid Repository?
+     *
+     * @return boolean
+     */
+    public function isValidRepo();
+
+    /**
+     * Get data entity for a path with defined attributes
      * <pre>
-     *   getListByPath('localeDisplayNames/languages');
+     *   getEntityByPath('localeDisplayNames/languages');
      *   // or
-     *   getListByPath('dates/calendars/calendar', array('type' => 'persian'));
+     *   getEntityByPath('dates/calendars/calendar', array('type' => 'persian'));
      * </pre>
      *
      * @param string $path Path to an element list
@@ -37,15 +44,5 @@ interface ReaderInterface
      *
      * @return mixed
      */
-    public function getListByPath($path, array $attributes = array());
-
-    /**
-     * Get Content String For Given Path
-     *
-     * @param string $path Path to an element list
-     * @param array $attributes Array key=>value pair of an element attribute
-     *
-     * @return string
-     */
-    public function getContentByPath($path, array $attributes = array());
+    public function getEntityByPath($path, array $attributes = array());
 }
