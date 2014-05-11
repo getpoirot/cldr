@@ -171,6 +171,9 @@ class LDML implements ReaderInterface
         foreach ($xmlElement as $r) {
 
             $elementName = $r->getName();
+            $elementName = ($elementName === $prevElementName) ? $elementName.'_'.++$i : $elementName;
+
+            $prevElementName = $elementName;
 
             $key = 'content';
             $content = null;
@@ -189,9 +192,8 @@ class LDML implements ReaderInterface
                 $elementAttrs[$key] = $content;
             }
 
-            $elementName = ($elementName === $prevElementName) ? $elementName.'_'.++$i : $elementName;
             $return[$elementName] = $elementAttrs;
-            $prevElementName = $elementName;
+
         }
 
         return $return;
