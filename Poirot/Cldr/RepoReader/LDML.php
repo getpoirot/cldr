@@ -109,9 +109,7 @@ class LDML implements ReaderInterface
     {
         $result = $this->readXml($path, $attributes);
 
-        echo '<pre>';
-        var_dump($result);
-        exit;
+        return $result;
     }
 
     /**
