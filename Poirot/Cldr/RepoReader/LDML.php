@@ -165,8 +165,9 @@ class LDML implements ReaderInterface
             $content = null;
 
             if (count($r)) {
-                $key = $elementName;
-                $content = $this->parsElement($r);
+                $return[$elementName] = $this->parsElement($r);
+
+                continue;
             }
 
             $content = ($content) ? $content : (string) $r;
