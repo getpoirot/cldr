@@ -9,10 +9,41 @@ use Poirot\Cldr\DataProvider\ProviderInterface;
  */
 class LDML implements BrowserInterface
 {
+    /**
+     * @var string exp. common/main
+     */
+    protected $dataName;
+
+    /**
+     * @var string Locale
+     */
+    protected $locale;
+
+    /**
+     * @var string Dir to repository
+     */
+    protected $repoDir;
+
+    /**
+     * Construct
+     *
+     * @param ProviderInterface|string $name   Name of data section
+     * @param string                   $locale Locale
+     */
+    public function __construct($name = null, $locale = null)
+    {
+        if ($name) {
+            $this->setDataName($name);
+        }
+
+        if ($locale) {
+            $this->setLocale($locale);
+        }
+    }
 
     /**
      * Set Data Section Name.
-     * exp. core/common/main
+     * exp. common/main
      *
      * @param ProviderInterface|string $name Name of data section
      *
@@ -20,7 +51,11 @@ class LDML implements BrowserInterface
      */
     public function setDataName($name)
     {
-        // TODO: Implement setDataName() method.
+        if ($name instanceof ProviderInterface) {
+            $name = $name->getDataName();
+        }
+
+        $this->dataName = $name;
     }
 
     /**
@@ -32,7 +67,7 @@ class LDML implements BrowserInterface
      */
     public function setLocale($locale)
     {
-        // TODO: Implement setLocale() method.
+        $this->locale = $locale;
     }
 
     /**
@@ -45,6 +80,63 @@ class LDML implements BrowserInterface
      */
     public function getRepo()
     {
-        // TODO: Implement getRepo() method.
+        $repoDir = $this->getRepositoryDir();
+
+        $dataName = $this->dataName;
+        $dataName = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $dataName);
+
+        $repoDir .= DIRECTORY_SEPARATOR.trim($dataName, DIRECTORY_SEPARATOR);
+
+        $locale   = $this->locale;
+
+        $repoFile = $repoDir.DIRECTORY_SEPARATOR.$locale.'.xml';
+        if (! file_exists($repoFile) && $locale != 'root') {
+            $locale = substr($locale, 0, -strlen(strrchr($locale, '_')));
+            $repoFile = $repoDir.DIRECTORY_SEPARATOR.$locale.'.xml';
+            if (! file_exists($repoFile)) {
+                $locale = 'root';
+            }
+
+            $this->setLocale($locale);
+
+            $repoFile = $this->getRepo();
+        }
+
+        return $repoFile;
+    }
+
+    /**
+     * Set Repository Directory
+     *
+     * @param string $dir Directory to repository
+     *
+     * @return $this
+     */
+    public function setRepositoryDir($dir)
+    {
+        if (!is_dir($dir)) {
+            throw new \Exception(sprintf('Invalid directory "%s".', $dir));
+        }
+
+        $this->repoDir = $dir;
+
+        return $this;
+    }
+
+    /**
+     * Get directory to repository
+     *
+     * @return string
+     */
+    public function getRepositoryDir()
+    {
+        if (!$this->repoDir) {
+            $DS = DIRECTORY_SEPARATOR;
+
+            $dir = realpath(__DIR__.$DS.'..'.$DS.'..'.$DS.'..'.$DS.'repoLdml');
+            $this->setRepositoryDir($dir);
+        }
+
+        return $this->repoDir;
     }
 }
