@@ -10,6 +10,13 @@ use Poirot\Cldr\RepoBrowser\BrowserInterface;
 interface ReaderInterface
 {
     /**
+     * Construct
+     *
+     * @param BrowserInterface $repo Repo Browser
+     */
+    public function __construct(BrowserInterface $repo);
+
+    /**
      * Set repository data
      *
      * @param BrowserInterface $repo Repository

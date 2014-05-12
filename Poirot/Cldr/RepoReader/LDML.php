@@ -26,7 +26,7 @@ class LDML implements ReaderInterface
      *
      * @param BrowserInterface $repo Repo Browser
      */
-    public function __construct(BrowserInterface $repo = null)
+    public function __construct(BrowserInterface $repo)
     {
         if ($repo) {
             $this->setRepoBrowser($repo);
