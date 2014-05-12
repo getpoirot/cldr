@@ -59,6 +59,16 @@ class LDML implements BrowserInterface
     }
 
     /**
+     * Get Locale Data Section Name
+     *
+     * @return string
+     */
+    public function getDataName()
+    {
+        return $this->dataName;
+    }
+
+    /**
      * Set Locale
      *
      * @param string $locale Locale
@@ -68,6 +78,16 @@ class LDML implements BrowserInterface
     public function setLocale($locale)
     {
         $this->locale = $locale;
+    }
+
+    /**
+     * Get Locale
+     *
+     * @return string
+     */
+    public function getLocale()
+    {
+        return $this->locale;
     }
 
     /**

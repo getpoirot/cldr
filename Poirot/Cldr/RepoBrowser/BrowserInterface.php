@@ -20,6 +20,13 @@ interface BrowserInterface
     public function setDataName($name);
 
     /**
+     * Get Locale Data Section Name
+     *
+     * @return string
+     */
+    public function getDataName();
+
+    /**
      * Set Locale
      *
      * @param string $locale Locale
@@ -27,6 +34,13 @@ interface BrowserInterface
      * @return $this
      */
     public function setLocale($locale);
+
+    /**
+     * Get Locale
+     *
+     * @return string
+     */
+    public function getLocale();
 
     /**
      * Get Repository
