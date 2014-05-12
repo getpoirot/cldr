@@ -30,8 +30,13 @@ class LDML implements ReaderInterface
      */
     public function setRepo($repo)
     {
-        if ($repo instanceof BrowserInterface) {
-            $repo = $repo->getRepo();
+        if (!$repo instanceof BrowserInterface || is_string($repo)) {
+            throw new \Exception(
+                sprintf(
+                    'Repository must be a string or BrowserInterface but "%s" given.',
+                    is_object($repo) ? get_class($repo) : gettype($repo)
+                )
+            );
         }
 
         $this->repo = $repo;
@@ -44,7 +49,15 @@ class LDML implements ReaderInterface
      */
     public function getRepo()
     {
-        return $this->repo;
+        $repo = $this->repo;
+
+        if ($repo instanceof BrowserInterface) {
+            // with this, when any changes happen to repoBrowser object affect this too.
+            // note: if we change locale of browser object will affect here.
+            $repo = $repo->getRepo();
+        }
+
+        return $repo;
     }
 
     /**
