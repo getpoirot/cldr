@@ -28,7 +28,7 @@ interface ReaderInterface
     /**
      * Get repository data for using inside a class
      *
-     * @return mixed
+     * @return BrowserInterface
      */
     public function getRepoBrowser();
 
