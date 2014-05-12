@@ -1,64 +1,20 @@
 <?php
 namespace  Poirot\Cldr\DataProvider;
-use Poirot\Cldr\RepoReader\ReaderInterface;
 
 /**
  * Class Main
- * inside cldr reop => core/common/main
+ * inside cldr reop => common/main
  *
  * @package Poirot\Cldr\Provider
  */
-class Main implements ProviderInterface
+class Main extends ProviderAbstract
 {
     /**
-     * Get Name Of Data Section
+     * This name is related to CLDR folder structure
      *
-     * @return string
+     * @var string Name of locale data section
      */
-    public function getDataName()
-    {
-        // TODO: Implement getDataName() method.
-    }
+    protected $name = 'common/main';
 
-    /**
-     * @param string $locale Locale
-     *
-     * @return $this
-     */
-    public function setLocale($locale)
-    {
-        // TODO: Implement setLocale() method.
-    }
-
-    /**
-     * Get Locale
-     *
-     * @return string
-     */
-    public function getLocale()
-    {
-        // TODO: Implement getLocale() method.
-    }
-
-    /**
-     * Set Repo Reader For Provider
-     *
-     * @param ReaderInterface $repoReader
-     *
-     * @return $this
-     */
-    public function setRepoReader(ReaderInterface $repoReader)
-    {
-        // TODO: Implement setRepoReader() method.
-    }
-
-    /**
-     * Get Repo Reader Instance
-     *
-     * @return ReaderInterface
-     */
-    public function getRepoReader()
-    {
-        // TODO: Implement getRepoReader() method.
-    }
+    
 }
