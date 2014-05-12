@@ -1,5 +1,6 @@
 <?php
 namespace Poirot\Cldr\RepoReader;
+use Poirot\Cldr\RepoBrowser\BrowserInterface;
 
 /**
  * Class LDML
@@ -23,12 +24,16 @@ class LDML implements ReaderInterface
     /**
      * Set repository data
      *
-     * @param $repo
+     * @param BrowserInterface|mixed $repo Repository
      *
      * @return $this
      */
     public function setRepo($repo)
     {
+        if ($repo instanceof BrowserInterface) {
+            $repo = $repo->getRepo();
+        }
+
         $this->repo = $repo;
     }
 

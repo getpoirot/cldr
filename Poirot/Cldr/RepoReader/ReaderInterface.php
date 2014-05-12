@@ -1,5 +1,6 @@
 <?php
 namespace Poirot\Cldr\RepoReader;
+use Poirot\Cldr\RepoBrowser\BrowserInterface;
 
 /**
  * Interface ReaderInterface
@@ -11,7 +12,7 @@ interface ReaderInterface
     /**
      * Set repository data
      *
-     * @param $repo
+     * @param BrowserInterface|mixed $repo Repository
      *
      * @return $this
      */
