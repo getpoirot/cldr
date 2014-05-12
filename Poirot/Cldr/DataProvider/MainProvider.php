@@ -2,12 +2,12 @@
 namespace  Poirot\Cldr\DataProvider;
 
 /**
- * Class Main
+ * Class MainProvider
  * inside cldr reop => common/main
  *
  * @package Poirot\Cldr\Provider
  */
-class Main extends ProviderAbstract
+class MainProvider extends ProviderAbstract
 {
     /**
      * This name is related to CLDR folder structure
@@ -16,5 +16,5 @@ class Main extends ProviderAbstract
      */
     protected $name = 'common/main';
 
-    
+
 }

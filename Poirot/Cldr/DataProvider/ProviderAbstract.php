@@ -1,7 +1,7 @@
 <?php
 namespace  Poirot\Cldr\DataProvider;
-use Poirot\Cldr\RepoBrowser\LDML as LDMLRepoBrowser;
-use Poirot\Cldr\RepoReader\LDML as LDMLReader;
+use Poirot\Cldr\RepoBrowser\LDMLRepo;
+use Poirot\Cldr\RepoReader\LDMLReader;
 use Poirot\Cldr\RepoReader\ReaderInterface;
 
 /**
@@ -98,7 +98,7 @@ class ProviderAbstract implements ProviderInterface
     public function getRepoReader()
     {
         if (!$this->repoReader) {
-            $repoBrowser = new LDMLRepoBrowser($this);
+            $repoBrowser = new LDMLRepo($this);
 
             $this->repoReader = new LDMLReader($repoBrowser);
         }

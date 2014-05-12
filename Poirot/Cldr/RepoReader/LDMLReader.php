@@ -7,7 +7,7 @@ use Poirot\Cldr\RepoBrowser\BrowserInterface;
  *
  * @package Poirot\Cldr\RepoReader
  */
-class LDML implements ReaderInterface
+class LDMLReader implements ReaderInterface
 {
     /**
      * @var string File path to repo XML

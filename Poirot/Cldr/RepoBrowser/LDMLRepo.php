@@ -3,11 +3,11 @@ namespace Poirot\Cldr\RepoBrowser;
 use Poirot\Cldr\DataProvider\ProviderInterface;
 
 /**
- * Class LDML
+ * Class LDMLRepo
  *
  * @package Poirot\Cldr\RepoBrowser
  */
-class LDML implements BrowserInterface
+class LDMLRepo implements BrowserInterface
 {
     /**
      * @var string exp. common/main
