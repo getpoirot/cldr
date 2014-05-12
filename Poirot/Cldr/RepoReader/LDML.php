@@ -22,42 +22,39 @@ class LDML implements ReaderInterface
     protected $simpleXMLElement;
 
     /**
+     * Construct
+     *
+     * @param BrowserInterface $repo Repo Browser
+     */
+    public function __construct(BrowserInterface $repo = null)
+    {
+        if ($repo) {
+            $this->setRepoBrowser($repo);
+        }
+    }
+
+    /**
      * Set repository data
      *
-     * @param BrowserInterface|mixed $repo Repository
+     * @param BrowserInterface $repo Repository
      *
      * @return $this
      */
-    public function setRepo($repo)
+    public function setRepoBrowser(BrowserInterface $repo)
     {
-        if (!$repo instanceof BrowserInterface || is_string($repo)) {
-            throw new \Exception(
-                sprintf(
-                    'Repository must be a string or BrowserInterface but "%s" given.',
-                    is_object($repo) ? get_class($repo) : gettype($repo)
-                )
-            );
-        }
-
         $this->repo = $repo;
+
+        return $this;
     }
 
     /**
      * Get repository data for using inside a class
      *
-     * @return mixed
+     * @return BrowserInterface
      */
-    public function getRepo()
+    public function getRepoBrowser()
     {
-        $repo = $this->repo;
-
-        if ($repo instanceof BrowserInterface) {
-            // with this, when any changes happen to repoBrowser object affect this too.
-            // note: if we change locale of browser object will affect here.
-            $repo = $repo->getRepo();
-        }
-
-        return $repo;
+        return $this->repo;
     }
 
     /**
@@ -81,7 +78,7 @@ class LDML implements ReaderInterface
     {
         $return = false;
 
-        $repo = $this->getRepo();
+        $repo = $this->getRepoBrowser()->getRepo();
 
         $repoNormalizeName = $repo;
         if (isset($this->simpleXMLElement[$repoNormalizeName])) {

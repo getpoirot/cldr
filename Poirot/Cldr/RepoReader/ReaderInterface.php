@@ -12,18 +12,18 @@ interface ReaderInterface
     /**
      * Set repository data
      *
-     * @param BrowserInterface|mixed $repo Repository
+     * @param BrowserInterface $repo Repository
      *
      * @return $this
      */
-    public function setRepo($repo);
+    public function setRepoBrowser(BrowserInterface $repo);
 
     /**
      * Get repository data for using inside a class
      *
      * @return mixed
      */
-    public function getRepo();
+    public function getRepoBrowser();
 
     /**
      * Is valid Repository?
