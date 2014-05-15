@@ -23,6 +23,13 @@ class LDMLReader implements ReaderInterface
     protected $simpleXMLElement;
 
     /**
+     * Using within recursive fallback from territory
+     *
+     * @var boolean
+     */
+    protected $fallback;
+
+    /**
      * Construct
      *
      * @param BrowserInterface $repo Repo Browser
@@ -178,7 +185,8 @@ class LDMLReader implements ReaderInterface
         $result = $xml->xpath($path);
         restore_error_handler();
 
-        if (empty($result)) {
+        if (empty($result) && ! $this->fallback) {
+            $this->fallback = true;
             // maybe we using territory of a locale, switch to patter
             // exp. fa_IR (to) fa
             $locale       = $this->getRepoBrowser()->getLocale();
@@ -186,7 +194,9 @@ class LDMLReader implements ReaderInterface
             $this->getRepoBrowser()->setLocale($localeParent);
 
             $result = $this->readXml($path, $attributes);
+            // step back defaults
             $this->getRepoBrowser()->setLocale($locale);
+            $this->fallback = false;
 
             return $result;
         }
