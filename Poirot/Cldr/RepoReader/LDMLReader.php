@@ -1,6 +1,7 @@
 <?php
 namespace Poirot\Cldr\RepoReader;
 use Poirot\Cldr\RepoBrowser\BrowserInterface;
+use SimpleXMLElement;
 
 /**
  * Class LDML
@@ -177,6 +178,19 @@ class LDMLReader implements ReaderInterface
         $result = $xml->xpath($path);
         restore_error_handler();
 
+        if (empty($result)) {
+            // maybe we using territory of a locale, switch to patter
+            // exp. fa_IR (to) fa
+            $locale       = $this->getRepoBrowser()->getLocale();
+            $localeParent = substr($locale, 0, -strlen(strrchr($locale, '_')));
+            $this->getRepoBrowser()->setLocale($localeParent);
+
+            $result = $this->readXml($path, $attributes);
+            $this->getRepoBrowser()->setLocale($locale);
+
+            return $result;
+        }
+
         $result = $this->parsElement($result);
 
         return $result;
@@ -194,6 +208,7 @@ class LDMLReader implements ReaderInterface
         $return = array();
 
         $prevElementName = ''; $i = 0;
+        /** @var $r SimpleXMLElement */
         foreach ($xmlElement as $r)
         {
             $elementName = $r->getName();
