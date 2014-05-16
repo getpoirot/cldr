@@ -230,4 +230,258 @@ class MainProvider extends ProviderAbstract
 
         return isset($data['characterOrder']['value']) ? $data['characterOrder']['value'] : null;
     }
+
+    /**
+     * Get localized translation of date fields
+     *
+     * @param string $code Field codes like: era, year, month, hour
+     *
+     * @return string|null
+     */
+    public function getDateFieldsName($code)
+    {
+        $code = strtolower($code);
+
+        $data = $this->getRepoReader()->getEntityByPath(
+            'dates/fields/field',
+            array('type' => $code)
+        );
+
+        return isset($data['field']['value'])
+            ? isset($data['field']['value']['displayName'])
+                ? $data['field']['value']['displayName']['value']
+                : null
+            : null;
+    }
+
+
+    /**
+     * Get dates relative phrase with next, prev, current steps.
+     * exp. ('sun', 1) => یکشنبهٔ آینده
+     *
+     * @param string $fieldType Can be: year, month, week, sun .. sat
+     * @param int    $time      0 current, -1 prev, 1 next
+     *
+     * @return string|null
+     */
+    public function getDateRelativeTimeStepsName($fieldType, $time)
+    {
+        $fieldType = strtolower($fieldType);
+
+        $data = $this->getRepoReader()->getEntityByPath(
+            'dates/fields/field[@type="'.$fieldType.'"]/relative',
+            array('type' => $time)
+        );
+
+        return isset($data['relative']['value']) ? $data['relative']['value'] : null;
+    }
+
+    /**
+     * Get Dates Future Past count phrase
+     *
+     * ('day', -21) => {0} روز پیش
+     * ('day', 2)   => {0} روز بعد
+     * ('day', 0)   => امروز
+     *
+     * @param string $fieldType Can be: year, month, week, day, hour, minute, second
+     * @param int    $count     0 current, -x(negative) for past, positive for future
+     *
+     * @return string|null
+     */
+    public function getDateFuturePastTimesNameByCount($fieldType, $count)
+    {
+        $fieldType = strtolower($fieldType);
+
+        if ($count == 0) {
+            return $this->getDateRelativeTimeStepsName($fieldType, 0);
+        } elseif ($count < 0) {
+            $type = 'past';
+        } else {
+            $type = 'future';
+        }
+
+        $count = ($count >= -1 && $count <= 1) ? 'one' : 'other';
+
+        $data = $this->getRepoReader()->getEntityByPath(
+            'dates/fields/field[@type="'.$fieldType.'"]/relativeTime[@type="'.$type.'"]/relativeTimePattern',
+            array('count' => $count)
+        );
+
+        return isset($data['relativeTimePattern']['value']) ? $data['relativeTimePattern']['value'] : null;
+    }
+
+    /**
+     * Get timezones list
+     * exp. ["Asia/Yerevan"] => "ایروان"
+     *
+     * @return array
+     */
+    public function getTimeZoneNamesList()
+    {
+        $data = $this->getRepoReader()->getEntityByPath('dates/timeZoneNames/zone');
+
+        $zones = array();
+        foreach($data as $zn) {
+            if (isset($zn['value']) && isset($zn['value']['exemplarCity'])) {
+                $zones[$zn['type']] = $zn['value']['exemplarCity']['value'];
+            }
+        }
+
+        return $zones;
+    }
+
+    /**
+     * Get name of timezone by code
+     *
+     * @param string $code Timezone name
+     *
+     * @return string|null
+     */
+    public function getTimeZoneNameByCode($code)
+    {
+        $data = $this->getRepoReader()->getEntityByPath(
+            'dates/timeZoneNames/zone',
+            array('type' => $code)
+        );
+
+        return isset($data['zone']['value'])
+            ? isset($data['zone']['value']['exemplarCity'])
+                ? $data['zone']['value']['exemplarCity']['value']
+                : null
+            : null;
+    }
+
+    /**
+     * Get Calendar Era Name
+     * exp:
+     * ('gregorian')    => قبل از میلاد
+     * ('gregorian', 1) => میلادی
+     *
+     * @param string $calendar Calendar type, gregorian|islamic|persian
+     * @param int    $type
+     *
+     * @return string|null
+     */
+    public function getCalendarEraName($calendar, $type = 0)
+    {
+        $calendar = strtolower($calendar);
+
+        $data = $this->getRepoReader()->getEntityByPath(
+            'dates/calendars/calendar[@type="'.$calendar.'"]/eras/eraNames/era'
+        );
+
+        $return = null;
+        foreach($data as $er) {
+            $return = (isset($return)) ? $return : $er['value'];
+
+            $return = ($er['type'] == $type) ? $er['value'] : $return;
+        }
+
+        return $return;
+    }
+
+    /**
+     * Get Calendar Era Abbr Name
+     * exp:
+     * ('gregorian')    => ق.م.
+     * ('gregorian', 1) => م.
+     *
+     * @param string $calendar Calendar type, gregorian|islamic|persian
+     * @param int    $type
+     *
+     * @return string|null
+     */
+    public function getCalendarEraAbbrName($calendar, $type = 0)
+    {
+        $calendar = strtolower($calendar);
+
+        $data = $this->getRepoReader()->getEntityByPath(
+            'dates/calendars/calendar[@type="'.$calendar.'"]/eras/eraAbbr/era'
+        );
+
+        $return = null;
+        foreach($data as $er) {
+            $return = (isset($return)) ? $return : $er['value'];
+
+            $return = ($er['type'] == $type) ? $er['value'] : $return;
+        }
+
+        return $return;
+    }
+
+    /**
+     * Get Calendar Era Narrow Name
+     * exp:
+     * ('gregorian')    => ق
+     * ('gregorian', 1) => م
+     *
+     * @param string $calendar Calendar type, gregorian|islamic|persian
+     * @param int    $type
+     *
+     * @return string|null
+     */
+    public function getCalendarEraNarrowName($calendar, $type = 0)
+    {
+        $calendar = strtolower($calendar);
+
+        $data = $this->getRepoReader()->getEntityByPath(
+            'dates/calendars/calendar[@type="'.$calendar.'"]/eras/eraNarrow/era'
+        );
+
+        $return = null;
+        foreach($data as $er) {
+            $return = (isset($return)) ? $return : $er['value'];
+
+            $return = ($er['type'] == $type) ? $er['value'] : $return;
+        }
+
+        return $return;
+    }
+
+
+    /**
+     * Get Month Localized for specific calendar
+     * exp.
+     * [1]=> "ژانویه"
+     * [2]=> "فوریه"
+     *
+     * @param string $calendar Calendar type, gregorian|islamic|persian
+     *
+     * @return array
+     */
+    public function getCalendarMonthsList($calendar)
+    {
+        $calendar = strtolower($calendar);
+
+        $data = $this->getRepoReader()->getEntityByPath(
+            'dates/calendars/calendar[@type="'.$calendar.'"]/months/monthContext[@type="stand-alone"]/monthWidth[@type="wide"]/month'
+        );
+
+        $months = array();
+        foreach($data as $mn) {
+            $months[$mn['type']] = $mn['value'];
+        }
+
+        return $months;
+    }
+
+    /**
+     * Get Month name for specific calendar
+     *
+     * @param string $calendar Calendar type, gregorian|islamic|persian
+     * @param int $num Which Month?
+     *
+     * @return string
+     */
+    public function getCalendarMonthName($calendar, $num)
+    {
+        $calendar = strtolower($calendar);
+
+        $data = $this->getRepoReader()->getEntityByPath(
+            'dates/calendars/calendar[@type="'.$calendar.'"]/months/monthContext[@type="stand-alone"]/monthWidth[@type="wide"]/month',
+            array('type' => $num)
+        );
+
+        return isset($data['month']['value']) ? $data['month']['value'] : null;
+    }
 }
